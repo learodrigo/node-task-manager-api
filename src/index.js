@@ -18,13 +18,13 @@ app.post('/users', (req, res) => {
     const user = new UserModel(req.body)
 
     user.save()
-    .then(() => res.send(user))
-    .catch(e => {
-        res.status(400).send({
-            error: e.message,
-            fullMessage: e
+        .then(() => res.status(201).send(user))
+        .catch(e => {
+            res.status(400).send({
+                error: e.message,
+                fullMessage: e
+            })
         })
-    })
 })
 
 // Tasks post endpoint
@@ -32,13 +32,13 @@ app.post('/tasks', (req, res) => {
     const task = new TaskModel(req.body)
 
     task.save()
-    .then(() => res.send(task))
-    .catch(e => {
-        res.status(400).send({
-            error: e.message,
-            fullMessage: e
+        .then(() => res.status(201).send(task))
+        .catch(e => {
+            res.status(400).send({
+                error: e.message,
+                fullMessage: e
+            })
         })
-    })
 })
 
 // Page not found route
