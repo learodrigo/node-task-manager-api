@@ -27,6 +27,39 @@ app.post('/users', (req, res) => {
         })
 })
 
+// Users all route
+app.get('/users', (req, res) => {
+    UserModel.find({})
+        .then(users => res.send(users))
+        .catch(e => {
+            res.status(400).send({
+                error: e.message,
+                fullMessage: e
+            })
+        })
+})
+
+// User route
+app.get('/users/:id', (req, res) => {
+    const _id = req.params.id
+
+    UserModel.findById(_id)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: `UserID: '${_id}' couldn't be found`
+                })
+            }
+            res.send(user)
+        })
+        .catch(e => {
+            res.status(500).send({
+                error: e.message,
+                fullMessage: e
+            })
+        })
+})
+
 // Tasks post endpoint
 app.post('/tasks', (req, res) => {
     const task = new TaskModel(req.body)
@@ -35,6 +68,40 @@ app.post('/tasks', (req, res) => {
         .then(() => res.status(201).send(task))
         .catch(e => {
             res.status(400).send({
+                error: e.message,
+                fullMessage: e
+            })
+        })
+})
+
+// Tasks all route
+app.get('/tasks', (req, res) => {
+    TaskModel.find({})
+        .then(tasks => res.send(tasks))
+        .catch(e => {
+            res.status(400).send({
+                error: e.message,
+                fullMessage: e
+            })
+        })
+})
+
+// Task route
+app.get('/tasks/:id', (req, res) => {
+    const _id = req.params.id
+
+    TaskModel.findById(_id)
+        .then(task => {
+            if (!task) {
+                return res.status(404).send({
+                    message: `TaskID: '${_id}' couldn't be found`
+                })
+            }
+
+            res.send(task)
+        })
+        .catch(e => {
+            res.status(500).send({
                 error: e.message,
                 fullMessage: e
             })
