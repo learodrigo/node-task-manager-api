@@ -1,0 +1,30 @@
+{
+  "name": "node-task-manager-app",
+  "description": "This tasks manager API performs CRUD operations through node with mongodb odm mongoosejs",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/learodrigo/node-task-app.git"
+  },
+  "keywords": [],
+  "author": "Leandro Rodrigo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/learodrigo/node-task-app/issues"
+  },
+  "homepage": "https://github.com/learodrigo/node-task-app#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.6",
+    "mongoose": "^5.12.7",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
