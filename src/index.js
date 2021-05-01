@@ -15,99 +15,91 @@ const PORT = process.env.PORT || 3000
 app.use(express.json())
 
 // Tasks post endpoint
-app.post('/tasks', (req, res) => {
+app.post('/tasks', async (req, res) => {
     const task = new TaskModel(req.body)
 
-    task.save()
-        .then(() => res.status(201).send(task))
-        .catch(e => {
-            res.status(400).send({
-                error: e.message,
-                fullMessage: e
-            })
-        })
+    try {
+        await task.save()
+        res.status(201).send(task)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
 })
 
 // List all tasks
-app.get('/tasks', (req, res) => {
-    TaskModel.find({})
-        .then(tasks => res.send(tasks))
-        .catch(e => {
-            res.status(400).send({
-                error: e.message,
-                fullMessage: e
-            })
-        })
+app.get('/tasks', async (req, res) => {
+    try {
+        const tasks = await TaskModel.find({})
+        res.send(tasks)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
 })
 
 // Reads specific task by ID
-app.get('/tasks/:id', (req, res) => {
+app.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
 
-    TaskModel.findById(_id)
-        .then(task => {
-            if (!task) {
-                return res.status(404).send({
-                    message: `TaskID: '${_id}' couldn't be found`
-                })
-            }
+    try {
+        const task = await TaskModel.findById(_id)
 
-            res.send(task)
-        })
-        .catch(e => {
-            res.status(500).send({
-                error: e.message,
-                fullMessage: e
+        if (!task) {
+            return res.status(404).send({
+                message: `TaskID: '${_id}' couldn't be found`
             })
-        })
+        }
+
+        res.send(task)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
 })
 
 // Users post endpoint
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
     const user = new UserModel(req.body)
 
-    user.save()
-        .then(() => res.status(201).send(user))
-        .catch(e => {
-            res.status(400).send({
-                error: e.message,
-                fullMessage: e
-            })
-        })
+    try {
+        await user.save()
+        res.status(201).send(user)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
 })
 
 // List all users
-app.get('/users', (req, res) => {
-    UserModel.find({})
-        .then(users => res.send(users))
-        .catch(e => {
-            res.status(400).send({
-                error: e.message,
-                fullMessage: e
-            })
-        })
+app.get('/users', async (req, res) => {
+    try {
+        const users = await UserModel.find({})
+        res.send(users)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
 })
 
 // Reads specific user by ID
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
 
-    UserModel.findById(_id)
-        .then(user => {
-            if (!user) {
-                return res.status(404).send({
-                    message: `UserID: '${_id}' couldn't be found`
-                })
-            }
+    try {
+        const user = await UserModel.findById(_id)
 
-            res.send(user)
-        })
-        .catch(e => {
-            res.status(500).send({
-                error: e.message,
-                fullMessage: e
+        if (!user) {
+            return res.status(404).send({
+                message: `UserID: '${_id}' couldn't be found`
             })
-        })
+        }
+
+        res.send(user)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
 })
 
 // Page not found route
