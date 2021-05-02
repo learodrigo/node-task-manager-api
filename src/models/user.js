@@ -71,6 +71,20 @@ userSchema.methods.generateAuthToken = async function () {
 }
 
 /**
+ * @async toJSON - Formats user object to be secutrly public
+ * @returns {object} - Object user
+ */
+userSchema.methods.toJSON = function () {
+    const user = this
+    const userObj = user.toObject()
+
+    delete userObj.password
+    delete userObj.tokens
+
+    return userObj
+}
+
+/**
  * @async findByCredentials - Looks and return for user given email-password pair
  * @param {string} email - Email address field
  * @param {string} password - Password field
