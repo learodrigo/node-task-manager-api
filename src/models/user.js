@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
-
 const bcrypt = require('bcryptjs')
-
+const jwt = require('jsonwebtoken')
 const validator = require('validator')
 
 const userSchema = new mongoose.Schema({
@@ -44,8 +43,32 @@ const userSchema = new mongoose.Schema({
     surname: {
         type: String,
         trim: true
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
+
+/**
+ * @async generateAuthToken - Looks and return for user given email-password pair
+ * @returns {object | null} - Verified token | null
+ */
+userSchema.methods.generateAuthToken = async function () {
+    const user = this
+
+    const token = jwt.sign(
+        { _id: user._id.toString() },
+        process.env.JWT_TOKEN_SECRET
+    )
+
+    user.tokens = user.tokens.concat({ token })
+
+    await user.save()
+    return token
+}
 
 /**
  * @async findByCredentials - Looks and return for user given email-password pair
@@ -89,6 +112,7 @@ userSchema.pre('save', async function(next) {
     next()
 })
 
+// Model creation
 const UserModel = mongoose.model('User', userSchema)
 
 module.exports = UserModel

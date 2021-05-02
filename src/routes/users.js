@@ -8,7 +8,7 @@ const usersRouter = express.Router()
  * @async GET - Returns a collection of users' documents
  * @returns {Object[] | null} - Array of user's documents
  */
-usersRouter.get('/users', async (req, res) => {
+usersRouter.get('/users', async (_, res) => {
     try {
         const users = await UserModel.find({})
         res.send(users)
@@ -23,10 +23,9 @@ usersRouter.get('/users', async (req, res) => {
  * @param {string} id - User id
  * @returns {Object[] | null} - A unique document found or null
  */
-usersRouter.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-
+usersRouter.get('/users/:id', async ({ params }, res) => {
     try {
+        const _id = params.id
         const user = await UserModel.findById(_id)
 
         if (!user) {
@@ -51,12 +50,13 @@ usersRouter.get('/users/:id', async (req, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object[] | null} Inserted object
  */
-usersRouter.post('/users', async (req, res) => {
-    const user = new UserModel(req.body)
-
+usersRouter.post('/users', async ({ body }, res) => {
     try {
+        const user = new UserModel(body)
         await user.save()
-        res.status(201).send(user)
+        const token = await user.generateAuthToken()
+
+        res.status(201).send({ user, token })
     }
     catch (error) {
         res.status(400).send(error)
@@ -68,12 +68,13 @@ usersRouter.post('/users', async (req, res) => {
  * @param {string} email - Email address field
  * @returns {Object[] | null} Inserted object
  */
-usersRouter.post('/users/login', async (req, res) => {
-    const { email, password } = req.body
-
+usersRouter.post('/users/login', async ({ body }, res) => {
     try {
+        const { email, password } = body
         const user = await UserModel.findByCredentials(email, password)
-        res.send(user)
+        const token = await user.generateAuthToken()
+
+        res.send({ user, token })
     }
     catch (e) {
         res.status(400).send('Unable to log in.')
@@ -89,9 +90,9 @@ usersRouter.post('/users/login', async (req, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object[] | null} Updated object
  */
-usersRouter.patch('/users/:id', async (req, res) => {
-    const _id = req.params.id
-    const updateObj = req.body
+usersRouter.patch('/users/:id', async({ body, params }, res) => {
+    const _id = params.id
+    const updateObj = body
 
     const updates = Object.keys(updateObj)
     const allowedUpdates = ['age', 'email', 'name', 'password', 'surname']
@@ -106,7 +107,6 @@ usersRouter.patch('/users/:id', async (req, res) => {
 
     try {
         const user = await UserModel.findById(_id)
-
         updates.forEach(update => user[update] = updateObj[update])
 
         await user.save()
@@ -129,10 +129,9 @@ usersRouter.patch('/users/:id', async (req, res) => {
  * @param {string} id - Id field
  * @returns {Object[] | null} Deleted object
  */
-usersRouter.delete('/users/:id', async (req, res) => {
-    const _id = req.params.id
-
+usersRouter.delete('/users/:id', async ({ params }, res) => {
     try {
+        const _id = params.id
         const user = await UserModel.findByIdAndDelete(_id)
 
         if (!user) {

@@ -8,7 +8,7 @@ const tasksRouter = express.Router()
  * GET - Returns a collection of tasks' documents
  * @returns {Object | null} - Array of tasks's documents
  */
-tasksRouter.get('/tasks', async (req, res) => {
+tasksRouter.get('/tasks', async (_, res) => {
     try {
         const tasks = await TaskModel.find({})
         res.send(tasks)
@@ -23,10 +23,9 @@ tasksRouter.get('/tasks', async (req, res) => {
  * @param {string} id - User id
  * @returns {Object | null} - A unique document or null
  */
-tasksRouter.get('/tasks/:id', async (req, res) => {
-    const _id = req.params.id
-
+tasksRouter.get('/tasks/:id', async ({ params }, res) => {
     try {
+        const _id = params.id
         const task = await TaskModel.findById(_id)
 
         if (!task) {
@@ -51,10 +50,9 @@ tasksRouter.get('/tasks/:id', async (req, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object | null} Inserted object
  */
-tasksRouter.post('/tasks', async (req, res) => {
-    const task = new TaskModel(req.body)
-
+tasksRouter.post('/tasks', async ({ body }, res) => {
     try {
+        const task = new TaskModel(body)
         await task.save()
         res.status(201).send(task)
     }
@@ -72,9 +70,9 @@ tasksRouter.post('/tasks', async (req, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object | null} Updated object
  */
-tasksRouter.patch('/tasks/:id', async (req, res) => {
-    const _id = req.params.id
-    const updateObj = req.body
+tasksRouter.patch('/tasks/:id', async ({ body, params }, res) => {
+    const _id = params.id
+    const updateObj = body
 
     const updates = Object.keys(updateObj)
     const allowedUpdates = ['description', 'date', 'completed']
@@ -89,7 +87,6 @@ tasksRouter.patch('/tasks/:id', async (req, res) => {
 
     try {
         const task = await TaskModel.findById(_id)
-
         updates.forEach(update => task[update] = updateObj[update])
 
         await task.save()
@@ -112,10 +109,9 @@ tasksRouter.patch('/tasks/:id', async (req, res) => {
  * @param {string} id - Id field
  * @returns {Object | null} Deleted object
  */
-tasksRouter.delete('/tasks/:id', async (req, res) => {
-    const _id = req.params.id
-
+tasksRouter.delete('/tasks/:id', async ({ params }, res) => {
     try {
+        const _id = params.id
         const user = await TaskModel.findByIdAndDelete(_id)
 
         if (!user) {
