@@ -14,20 +14,7 @@ const PORT = process.env.PORT || 3000
 // App config
 app.use(express.json())
 
-// Tasks post endpoint
-app.post('/tasks', async (req, res) => {
-    const task = new TaskModel(req.body)
-
-    try {
-        await task.save()
-        res.status(201).send(task)
-    }
-    catch (error) {
-        res.status(400).send(error)
-    }
-})
-
-// List all tasks
+// GET - All tasks
 app.get('/tasks', async (req, res) => {
     try {
         const tasks = await TaskModel.find({})
@@ -38,7 +25,18 @@ app.get('/tasks', async (req, res) => {
     }
 })
 
-// Reads specific task by ID
+// GET - All users
+app.get('/users', async (req, res) => {
+    try {
+        const users = await UserModel.find({})
+        res.send(users)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+// GET - task by ID
 app.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
 
@@ -58,31 +56,7 @@ app.get('/tasks/:id', async (req, res) => {
     }
 })
 
-// Users post endpoint
-app.post('/users', async (req, res) => {
-    const user = new UserModel(req.body)
-
-    try {
-        await user.save()
-        res.status(201).send(user)
-    }
-    catch (error) {
-        res.status(400).send(error)
-    }
-})
-
-// List all users
-app.get('/users', async (req, res) => {
-    try {
-        const users = await UserModel.find({})
-        res.send(users)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
-})
-
-// Reads specific user by ID
+// GET - user by ID
 app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
 
@@ -99,6 +73,102 @@ app.get('/users/:id', async (req, res) => {
     }
     catch (error) {
         res.status(500).send(error)
+    }
+})
+
+// POST - Tasks endpoint
+app.post('/tasks', async (req, res) => {
+    const task = new TaskModel(req.body)
+
+    try {
+        await task.save()
+        res.status(201).send(task)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+// POST - Users endpoint
+app.post('/users', async (req, res) => {
+    const user = new UserModel(req.body)
+
+    try {
+        await user.save()
+        res.status(201).send(user)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+// PATCH - Updates task
+app.patch('/tasks/:id', async (req, res) => {
+    const updateObj = req.body
+    const id = req.params.id
+    const optionsObj = {
+        new: true,
+        runValidators: true
+    }
+
+    const allowedUpdates = ['description', 'date', 'completed']
+    const updates = Object.keys(updateObj)
+    const isValidOperation = updates.every(update => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({
+            error: `Unable to update UserID: ${id}. Check your request body: ${JSON.stringify(updateObj)}`
+        })
+    }
+
+    try {
+        const task = await TaskModel.findByIdAndUpdate(id, updateObj, optionsObj)
+
+        if (!task) {
+            return res.status(404).send({
+                message: `UserID: '${_id}' couldn't be found`
+            })
+        }
+
+        res.send(task)
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+// PATCH - Updates user
+app.patch('/users/:id', async (req, res) => {
+    const updateObj = req.body
+    const id = req.params.id
+    const optionsObj = {
+        new: true,
+        runValidators: true
+    }
+
+    const allowedUpdates = ['name', 'surname', 'email', 'password', 'age']
+    const updates = Object.keys(updateObj)
+    const isValidOperation = updates.every(update => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({
+            error: `Unable to update UserID: ${id}. Check your request body: ${JSON.stringify(updateObj)}`
+        })
+    }
+
+    try {
+        const user = await UserModel.findByIdAndUpdate(id, updateObj, optionsObj)
+
+        if (!user) {
+            return res.status(404).send({
+                message: `UserID: '${_id}' couldn't be found`
+            })
+        }
+
+        res.send(user)
+    }
+    catch (error) {
+        res.status(400).send(error)
     }
 })
 
