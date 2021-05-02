@@ -12,8 +12,9 @@ const mainRouter = require('./routes/main')
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// App config & Routers
+// App config
 app.use(express.json())
+// Routers
 app.use(userRouter)
 app.use(tasksRouter)
 app.use(mainRouter)

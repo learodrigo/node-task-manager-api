@@ -1,21 +1,14 @@
 const express = require('express')
-
+const auth = require('../middleware/auth')
 const UserModel = require('../models/user')
-
 const usersRouter = express.Router()
 
 /**
  * @async GET - Returns a collection of users' documents
  * @returns {Object[] | null} - Array of user's documents
  */
-usersRouter.get('/users', async (_, res) => {
-    try {
-        const users = await UserModel.find({})
-        res.send(users)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
+usersRouter.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
 
 /**

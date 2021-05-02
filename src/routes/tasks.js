@@ -1,7 +1,5 @@
 const express = require('express')
-
 const TaskModel = require('../models/task')
-
 const tasksRouter = express.Router()
 
 /**
