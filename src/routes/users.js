@@ -1,5 +1,4 @@
 const express = require('express')
-
 const UserModel = require('../models/user')
 
 const usersRouter = express.Router()
@@ -73,25 +72,26 @@ usersRouter.post('/users', async (req, res) => {
  * @returns {Object[] | null} Updated object
  */
 usersRouter.patch('/users/:id', async (req, res) => {
+    const _id = req.params.id
     const updateObj = req.body
-    const id = req.params.id
-    const optionsObj = {
-        new: true,
-        runValidators: true
-    }
 
-    const allowedUpdates = ['name', 'surname', 'email', 'password', 'age']
     const updates = Object.keys(updateObj)
-    const isValidOperation = updates.every(update => allowedUpdates.includes(update))
+    const allowedUpdates = ['age', 'email', 'name', 'password', 'surname']
+
+    const isValidOperation = updates.every(ele => allowedUpdates.includes(ele))
 
     if (!isValidOperation) {
         return res.status(400).send({
-            error: `Unable to update UserID: ${id}. Check your request body: ${JSON.stringify(updateObj)}`
+            error: `Unable to update UserID: ${_id}. Check your request body: ${JSON.stringify(updateObj)}`
         })
     }
 
     try {
-        const user = await UserModel.findByIdAndUpdate(id, updateObj, optionsObj)
+        const user = await UserModel.findById(_id)
+
+        updates.forEach(update => user[update] = updateObj[update])
+
+        await user.save()
 
         if (!user) {
             return res.status(404).send({

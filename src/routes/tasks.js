@@ -73,25 +73,26 @@ tasksRouter.post('/tasks', async (req, res) => {
  * @returns {Object | null} Updated object
  */
 tasksRouter.patch('/tasks/:id', async (req, res) => {
+    const _id = req.params.id
     const updateObj = req.body
-    const id = req.params.id
-    const optionsObj = {
-        new: true,
-        runValidators: true
-    }
 
-    const allowedUpdates = ['description', 'date', 'completed']
     const updates = Object.keys(updateObj)
+    const allowedUpdates = ['description', 'date', 'completed']
+
     const isValidOperation = updates.every(update => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
         return res.status(400).send({
-            error: `Unable to update UserID: ${id}. Check your request body: ${JSON.stringify(updateObj)}`
+            error: `Unable to update UserID: ${_id}. Check your request body: ${JSON.stringify(updateObj)}`
         })
     }
 
     try {
-        const task = await TaskModel.findByIdAndUpdate(id, updateObj, optionsObj)
+        const task = await TaskModel.findById(_id)
+
+        updates.forEach(update => task[update] = updateObj[update])
+
+        await task.save()
 
         if (!task) {
             return res.status(404).send({
