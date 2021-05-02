@@ -172,6 +172,46 @@ app.patch('/users/:id', async (req, res) => {
     }
 })
 
+// DELETE - Task
+app.delete('/tasks/:id', async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const user = await TaskModel.findByIdAndDelete(_id)
+
+        if (!user) {
+            return res.status(404).send({
+                message: `TaskID: '${_id}' couldn't be found`
+            })
+        }
+
+        res.send(user)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+// DELETE - User
+app.delete('/users/:id', async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const user = await UserModel.findByIdAndDelete(_id)
+
+        if (!user) {
+            return res.status(404).send({
+                message: `UserID: '${_id}' couldn't be found`
+            })
+        }
+
+        res.send(user)
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+})
+
 // Page not found route
 app.get('*', (req, res) => {
     res.send({
