@@ -6,7 +6,7 @@ const usersRouter = express.Router()
 
 /**
  * GET - Returns a collection of users' documents
- * @returns: {Object[] | null} - Array of user's documents
+ * @returns {Object[] | null} - Array of user's documents
  */
 usersRouter.get('/users', async (req, res) => {
     try {
@@ -21,7 +21,7 @@ usersRouter.get('/users', async (req, res) => {
 /**
  * GET - Returns a specific user document by a given id
  * @param {string} id - User id
- * @returns: {Object | null} - A unique document found or null
+ * @returns {Object[] | null} - A unique document found or null
  */
 usersRouter.get('/users/:id', async (req, res) => {
     const _id = req.params.id
@@ -49,7 +49,7 @@ usersRouter.get('/users/:id', async (req, res) => {
  * @param {string} password - Password field
  * @param {number?} age - Age field, it should be positive and has default 0
  * @param {surname?} surname - User's surname
- * @returns Inserted object
+ * @returns {Object[] | null} Inserted object
  */
 usersRouter.post('/users', async (req, res) => {
     const user = new UserModel(req.body)
@@ -70,7 +70,7 @@ usersRouter.post('/users', async (req, res) => {
  * @param {string} password - Password field
  * @param {number?} age - Age field, it should be positive and has default 0
  * @param {surname?} surname - User's surname
- * @returns Updated object
+ * @returns {Object[] | null} Updated object
  */
 usersRouter.patch('/users/:id', async (req, res) => {
     const updateObj = req.body
@@ -109,7 +109,7 @@ usersRouter.patch('/users/:id', async (req, res) => {
 /**
  * DELETE - Deletes a specific user
  * @param {string} id - Id field
- * @returns Deleted object
+ * @returns {Object[] | null} Deleted object
  */
 usersRouter.delete('/users/:id', async (req, res) => {
     const _id = req.params.id

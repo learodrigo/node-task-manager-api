@@ -6,7 +6,7 @@ const tasksRouter = express.Router()
 
 /**
  * GET - Returns a collection of tasks' documents
- * @returns: {Object[] | null} - Array of tasks's documents
+ * @returns {Object | null} - Array of tasks's documents
  */
 tasksRouter.get('/tasks', async (req, res) => {
     try {
@@ -21,7 +21,7 @@ tasksRouter.get('/tasks', async (req, res) => {
 /**
  * GET - Returns a specific task document by a given id
  * @param {string} id - User id
- * @returns: {Object | null} - A unique document or null
+ * @returns {Object | null} - A unique document or null
  */
 tasksRouter.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
@@ -49,7 +49,7 @@ tasksRouter.get('/tasks/:id', async (req, res) => {
  * @param {string} password - Password field
  * @param {number?} age - Age field, it should be positive and has default 0
  * @param {surname?} surname - User's surname
- * @returns Inserted object
+ * @returns {Object | null} Inserted object
  */
 tasksRouter.post('/tasks', async (req, res) => {
     const task = new TaskModel(req.body)
@@ -70,7 +70,7 @@ tasksRouter.post('/tasks', async (req, res) => {
  * @param {string} password - Password field
  * @param {number?} age - Age field, it should be positive and has default 0
  * @param {surname?} surname - User's surname
- * @returns Updated object
+ * @returns {Object | null} Updated object
  */
 tasksRouter.patch('/tasks/:id', async (req, res) => {
     const updateObj = req.body
@@ -109,7 +109,7 @@ tasksRouter.patch('/tasks/:id', async (req, res) => {
 /**
  * DELETE - Deletes a specific task
  * @param {string} id - Id field
- * @returns Deleted object
+ * @returns {Object | null} Deleted object
  */
 tasksRouter.delete('/tasks/:id', async (req, res) => {
     const _id = req.params.id

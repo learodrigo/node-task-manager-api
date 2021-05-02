@@ -4,7 +4,7 @@ const mainRouter = express.Router()
 
 /**
  * GET - Page not found route
- * @returns: Object with message
+ * @returns {Object | null} Object with message
  */
 mainRouter.get('*', (req, res) => {
     res.send({
