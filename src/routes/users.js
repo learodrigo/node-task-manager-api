@@ -1,10 +1,11 @@
 const express = require('express')
+
 const UserModel = require('../models/user')
 
 const usersRouter = express.Router()
 
 /**
- * GET - Returns a collection of users' documents
+ * @async GET - Returns a collection of users' documents
  * @returns {Object[] | null} - Array of user's documents
  */
 usersRouter.get('/users', async (req, res) => {
@@ -18,7 +19,7 @@ usersRouter.get('/users', async (req, res) => {
 })
 
 /**
- * GET - Returns a specific user document by a given id
+ * @async GET - Returns a specific user document by a given id
  * @param {string} id - User id
  * @returns {Object[] | null} - A unique document found or null
  */
@@ -42,7 +43,7 @@ usersRouter.get('/users/:id', async (req, res) => {
 })
 
 /**
- * POST - Add user endpoint
+ * @async POST - Add user endpoint
  * @param {string} email - Email address field
  * @param {string} name - Name field
  * @param {string} password - Password field
@@ -63,7 +64,24 @@ usersRouter.post('/users', async (req, res) => {
 })
 
 /**
- * PATCH - Updates user
+ * @async POST - Login endpoint
+ * @param {string} email - Email address field
+ * @returns {Object[] | null} Inserted object
+ */
+usersRouter.post('/users/login', async (req, res) => {
+    const { email, password } = req.body
+
+    try {
+        const user = await UserModel.findByCredentials(email, password)
+        res.send(user)
+    }
+    catch (e) {
+        res.status(400).send('Unable to log in.')
+    }
+})
+
+/**
+ * @async PATCH - Updates user
  * @param {string} email - Email address field
  * @param {string} name - Name field
  * @param {string} password - Password field
@@ -107,7 +125,7 @@ usersRouter.patch('/users/:id', async (req, res) => {
 })
 
 /**
- * DELETE - Deletes a specific user
+ * @async DELETE - Deletes a specific user
  * @param {string} id - Id field
  * @returns {Object[] | null} Deleted object
  */
