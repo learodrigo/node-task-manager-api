@@ -11,9 +11,15 @@ const tasksRouter = express.Router()
  */
 tasksRouter.get('/tasks', auth, async ({ query, user }, res) => {
     const match = {}
+    const sort = {}
 
     if (query.completed) {
         match.completed = query.completed === 'true'
+    }
+
+    if (query.sortBy) {
+        const [key, value] = query.sortBy.split(':')
+        sort[key] = value === 'desc' ? -1 : 1
     }
 
     try {
@@ -21,7 +27,8 @@ tasksRouter.get('/tasks', auth, async ({ query, user }, res) => {
             match,
             options: {
                 limit: parseInt(query.limit),
-                skip: parseInt(query.skip)
+                skip: parseInt(query.skip),
+                sort
             },
             path: 'tasks'
         }).execPopulate()
