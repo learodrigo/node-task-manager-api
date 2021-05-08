@@ -127,7 +127,19 @@ userSchema.pre('save', async function(next) {
     next()
 })
 
+/**
+ * Virtual reference to tasks model
+ * @param {String} foreignField - Reference to foreign field
+ * @param {String} localField - Reference to local field
+ * @param {String} ref - Reference to model's name
+ */
+userSchema.virtual('tasks', {
+    foreignField: 'user',
+    localField: '_id',
+    ref: 'TaskModel'
+})
+
 // Model creation
-const UserModel = mongoose.model('User', userSchema)
+const UserModel = mongoose.model('UserModel', userSchema)
 
 module.exports = UserModel

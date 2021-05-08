@@ -1,15 +1,17 @@
 const express = require('express')
 const TaskModel = require('../models/task')
+const auth = require('../middleware/auth')
 const tasksRouter = express.Router()
 
 /**
- * GET - Returns a collection of tasks' documents
+ * GET - Returns a collection of tasks' documents for current user
  * @returns {Object | null} - Array of tasks's documents
  */
-tasksRouter.get('/tasks', async (_, res) => {
+tasksRouter.get('/tasks', auth, async ({ user }, res) => {
     try {
-        const tasks = await TaskModel.find({})
-        res.send(tasks)
+        await user.populate('tasks').execPopulate()
+
+        res.send(user.tasks)
     }
     catch (error) {
         res.status(400).send(error)
@@ -21,10 +23,11 @@ tasksRouter.get('/tasks', async (_, res) => {
  * @param {string} id - User id
  * @returns {Object | null} - A unique document or null
  */
-tasksRouter.get('/tasks/:id', async ({ params }, res) => {
+tasksRouter.get('/tasks/:id', auth, async ({ params, user }, res) => {
     try {
         const _id = params.id
-        const task = await TaskModel.findById(_id)
+
+        const task = await TaskModel.findOne({ _id, user: user._id })
 
         if (!task) {
             return res.status(404).send({
@@ -41,17 +44,18 @@ tasksRouter.get('/tasks/:id', async ({ params }, res) => {
 
 /**
  * POST - Add task endpoint
- * @param {string} email - Email address field
- * @param {string} name - Name field
- * @param {string} password - Password field
- * @param {number?} age - Age field, it should be positive and has default 0
- * @param {surname?} surname - User's surname
- * @returns {Object | null} Inserted object
+ * @param {string} description - Task description
+ * @returns {Object | null} Inserted document
  */
-tasksRouter.post('/tasks', async ({ body }, res) => {
+tasksRouter.post('/tasks', auth, async ({ body, user }, res) => {
     try {
-        const task = new TaskModel(body)
+        const task = new TaskModel({
+            ...body,
+            user: user._id
+        })
+
         await task.save()
+
         res.status(201).send(task)
     }
     catch (error) {
@@ -61,39 +65,36 @@ tasksRouter.post('/tasks', async ({ body }, res) => {
 
 /**
  * PATCH - Updates task
- * @param {string} email - Email address field
- * @param {string} name - Name field
- * @param {string} password - Password field
- * @param {number?} age - Age field, it should be positive and has default 0
- * @param {surname?} surname - User's surname
+ * @param {string} description - Task description field
+ * @param {boolean} completed - Task completed field
  * @returns {Object | null} Updated object
  */
-tasksRouter.patch('/tasks/:id', async ({ body, params }, res) => {
+tasksRouter.patch('/tasks/:id', auth, async ({ body, params, user }, res) => {
     const _id = params.id
-    const updateObj = body
 
-    const updates = Object.keys(updateObj)
+    const updates = Object.keys(body)
     const allowedUpdates = ['description', 'date', 'completed']
 
     const isValidOperation = updates.every(update => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
         return res.status(400).send({
-            error: `Unable to update UserID: ${_id}. Check your request body: ${JSON.stringify(updateObj)}`
+            error: `Unable to update UserID: ${_id}. Check your request body: ${JSON.stringify(body)}`
         })
     }
 
     try {
-        const task = await TaskModel.findById(_id)
-        updates.forEach(update => task[update] = updateObj[update])
-
-        await task.save()
+        const task = await TaskModel.findOne({ _id, user: user._id })
 
         if (!task) {
             return res.status(404).send({
-                message: `UserID: '${_id}' couldn't be found`
+                message: `TaskID: '${_id}' doesn't exist`
             })
         }
+
+        updates.forEach(update => task[update] = body[update])
+
+        await task.save()
 
         res.send(task)
     }
@@ -103,22 +104,23 @@ tasksRouter.patch('/tasks/:id', async ({ body, params }, res) => {
 })
 
 /**
- * DELETE - Deletes a specific task
- * @param {string} id - Id field
+ * DELETE - Deletes a specific task for current user
+ * @param {string} id - Task id field
  * @returns {Object | null} Deleted object
  */
-tasksRouter.delete('/tasks/:id', async ({ params }, res) => {
+tasksRouter.delete('/tasks/:id', auth, async ({ params, user }, res) => {
     try {
         const _id = params.id
-        const user = await TaskModel.findByIdAndDelete(_id)
 
-        if (!user) {
+        const task = await TaskModel.findOneAndDelete({ _id, user: user._id })
+
+        if (!task) {
             return res.status(404).send({
                 message: `TaskID: '${_id}' couldn't be found`
             })
         }
 
-        res.send(user)
+        res.send(task)
     }
     catch (error) {
         res.status(500).send(error)
