@@ -12,29 +12,6 @@ usersRouter.get('/users/me', auth, async (req, res) => {
 })
 
 /**
- * @async GET - Returns a specific user document by a given id
- * @param {string} id - User id
- * @returns {Object[] | null} - A unique document found or null
- */
-usersRouter.get('/users/:id', async ({ params }, res) => {
-    try {
-        const _id = params.id
-        const user = await UserModel.findById(_id)
-
-        if (!user) {
-            return res.status(404).send({
-                message: `UserID: '${_id}' couldn't be found`
-            })
-        }
-
-        res.send(user)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
-})
-
-/**
  * @async POST - Add user endpoint
  * @param {string} email - Email address field
  * @param {string} name - Name field
@@ -43,9 +20,9 @@ usersRouter.get('/users/:id', async ({ params }, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object[] | null} Inserted object
  */
-usersRouter.post('/users', async ({ body }, res) => {
+usersRouter.post('/users', async (req, res) => {
     try {
-        const user = new UserModel(body)
+        const user = new UserModel(req.body)
         await user.save()
         const token = await user.generateAuthToken()
 
@@ -113,7 +90,7 @@ usersRouter.post('/users/logout-all', auth, async (req, res) => {
 })
 
 /**
- * @async PATCH - Updates user
+ * @async PATCH - Updates current user
  * @param {string} email - Email address field
  * @param {string} name - Name field
  * @param {string} password - Password field
@@ -121,32 +98,22 @@ usersRouter.post('/users/logout-all', auth, async (req, res) => {
  * @param {surname?} surname - User's surname
  * @returns {Object[] | null} Updated object
  */
-usersRouter.patch('/users/:id', async({ body, params }, res) => {
-    const _id = params.id
-    const updateObj = body
-
-    const updates = Object.keys(updateObj)
+usersRouter.patch('/users/me', auth, async({ body, user }, res) => {
+    const updates = Object.keys(body)
     const allowedUpdates = ['age', 'email', 'name', 'password', 'surname']
 
     const isValidOperation = updates.every(ele => allowedUpdates.includes(ele))
 
     if (!isValidOperation) {
         return res.status(400).send({
-            error: `Unable to update UserID: ${_id}. Check your request body: ${JSON.stringify(updateObj)}`
+            error: `Unable to update user. Check your request body: ${JSON.stringify(body)}`
         })
     }
 
     try {
-        const user = await UserModel.findById(_id)
-        updates.forEach(update => user[update] = updateObj[update])
+        updates.forEach(update => user[update] = body[update])
 
         await user.save()
-
-        if (!user) {
-            return res.status(404).send({
-                message: `UserID: '${_id}' couldn't be found`
-            })
-        }
 
         res.send(user)
     }
@@ -157,21 +124,13 @@ usersRouter.patch('/users/:id', async({ body, params }, res) => {
 
 /**
  * @async DELETE - Deletes a specific user
- * @param {string} id - Id field
  * @returns {Object[] | null} Deleted object
  */
-usersRouter.delete('/users/:id', async ({ params }, res) => {
+usersRouter.delete('/users/me', auth, async (req, res) => {
     try {
-        const _id = params.id
-        const user = await UserModel.findByIdAndDelete(_id)
+        await req.user.remove()
 
-        if (!user) {
-            return res.status(404).send({
-                message: `UserID: '${_id}' couldn't be found`
-            })
-        }
-
-        res.send(user)
+        res.send(req.user)
     }
     catch (error) {
         res.status(500).send(error)
