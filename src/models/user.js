@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
 
+const TaskModel = require('./task')
+
 const userSchema = new mongoose.Schema({
     age: {
         type: Number,
@@ -123,6 +125,18 @@ userSchema.pre('save', async function(next) {
             console.log(e)
         }
     }
+
+    next()
+})
+
+/**
+ * @async Deletes user's tasks when removed
+ * @returns {void}
+ */
+userSchema.pre('remove', async function(next) {
+    const user = this
+
+    await TaskModel.deleteMany({ user: user._id })
 
     next()
 })
