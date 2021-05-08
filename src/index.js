@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000
 
 // App config
 app.use(express.json())
+
 // Routers
 app.use(userRouter)
 app.use(tasksRouter)

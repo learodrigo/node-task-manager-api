@@ -1,5 +1,8 @@
 const express = require('express')
+
+const multer = require('multer')
 const auth = require('../middleware/auth')
+
 const UserModel = require('../models/user')
 const usersRouter = express.Router()
 
@@ -87,6 +90,30 @@ usersRouter.post('/users/logout-all', auth, async (req, res) => {
     catch (e) {
         res.status(500).send({ error: 'Unable to logout' })
     }
+})
+
+/**
+ * POST - Uploads user profile image with form-data
+ * @returns {void}
+ */
+const upload = multer({
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        const regex = /\.(gif|jpg|jpeg|png)$/
+
+        if (!file.originalname.match(regex)) {
+            return cb(new Error('Upload image file only'))
+        }
+
+        cb(undefined, true)
+    }
+})
+
+usersRouter.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+    res.send()
 })
 
 /**
