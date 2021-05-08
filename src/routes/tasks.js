@@ -1,15 +1,30 @@
 const express = require('express')
+
 const TaskModel = require('../models/task')
 const auth = require('../middleware/auth')
+
 const tasksRouter = express.Router()
 
 /**
  * GET - Returns a collection of tasks' documents for current user
  * @returns {Object | null} - Array of tasks's documents
  */
-tasksRouter.get('/tasks', auth, async ({ user }, res) => {
+tasksRouter.get('/tasks', auth, async ({ query, user }, res) => {
+    const match = {}
+
+    if (query.completed) {
+        match.completed = query.completed === 'true'
+    }
+
     try {
-        await user.populate('tasks').execPopulate()
+        await user.populate({
+            match,
+            options: {
+                limit: parseInt(query.limit),
+                skip: parseInt(query.skip)
+            },
+            path: 'tasks'
+        }).execPopulate()
 
         res.send(user.tasks)
     }
