@@ -5,10 +5,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    date: {
-        type: Date,
-        default: new Date()
-    },
     description: {
         type: String,
         required: true,
@@ -19,6 +15,8 @@ const userSchema = new mongoose.Schema({
         required: true,
         ref: 'UserModel'
     }
+}, {
+    timestamps: true
 })
 
 const TaskModel = mongoose.model('TaskModel', userSchema)
