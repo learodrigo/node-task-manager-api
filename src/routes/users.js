@@ -15,6 +15,27 @@ usersRouter.get('/users/me', auth, async (req, res) => {
 })
 
 /**
+ * GET - Gets user avatar
+ * @returns {void}
+ */
+usersRouter.get('/users/:id/avatar', async ({ params }, res) => {
+    try {
+        const user = await UserModel.findById(params.id)
+
+        if (!user || !user.avatar) {
+            throw new Error()
+        }
+
+        res.set('Content-Type', 'image/jpg')
+
+        res.send(user.avatar)
+    }
+    catch (error) {
+        res.status(404).send()
+    }
+})
+
+/**
  * @async POST - Add user endpoint
  * @param {string} email - Email address field
  * @param {string} name - Name field
@@ -170,7 +191,7 @@ usersRouter.delete('/users/me', auth, async (req, res) => {
 })
 
 /**
- * DELETE - Deletes user profile image with form-data
+ * DELETE - Deletes user profile image
  * @returns {void}
  */
 usersRouter.delete('/users/me/avatar', auth, async ({ user }, res) => {
