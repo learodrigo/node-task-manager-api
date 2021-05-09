@@ -5,6 +5,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 
 const UserModel = require('../models/user')
+const { sendWelcomeEmail, sendCancelationEmail } = require('../emails/account')
 
 const usersRouter = express.Router()
 
@@ -49,13 +50,17 @@ usersRouter.get('/users/:id/avatar', async ({ params }, res) => {
 usersRouter.post('/users', async (req, res) => {
     try {
         const user = new UserModel(req.body)
+
         await user.save()
+
+        sendWelcomeEmail(user)
+
         const token = await user.generateAuthToken()
 
         res.status(201).send({ user, token })
     }
     catch (error) {
-        res.status(400).send(error)
+        res.status(400).send({ error: error.message })
     }
 })
 
@@ -186,11 +191,13 @@ usersRouter.patch('/users/me', auth, async({ body, user }, res) => {
  * @async DELETE - Deletes a specific user
  * @returns {Object[] | null} Deleted object
  */
-usersRouter.delete('/users/me', auth, async (req, res) => {
+usersRouter.delete('/users/me', auth, async ({ user }, res) => {
     try {
-        await req.user.remove()
+        await user.remove()
 
-        res.send(req.user)
+        sendCancelationEmail(user)
+
+        res.send(user)
     }
     catch (error) {
         res.status(500).send(error)
