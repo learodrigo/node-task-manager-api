@@ -97,7 +97,6 @@ usersRouter.post('/users/logout-all', auth, async (req, res) => {
  * @returns {void}
  */
 const upload = multer({
-    dest: 'avatars',
     limits: {
         fileSize: 1000000
     },
@@ -112,7 +111,11 @@ const upload = multer({
     }
 })
 
-usersRouter.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+usersRouter.post('/users/me/avatar', auth, upload.single('avatar'), async ({ file, user }, res) => {
+    user.avatar = file.buffer
+
+    await user.save()
+
     res.send()
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
@@ -164,6 +167,18 @@ usersRouter.delete('/users/me', auth, async (req, res) => {
     catch (error) {
         res.status(500).send(error)
     }
+})
+
+/**
+ * DELETE - Deletes user profile image with form-data
+ * @returns {void}
+ */
+usersRouter.delete('/users/me/avatar', auth, async ({ user }, res) => {
+    user.avatar = undefined
+
+    await user.save()
+
+    res.send()
 })
 
 module.exports = usersRouter

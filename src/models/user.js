@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    avatar: {
+        type: Buffer
+    },
     email: {
         type: String,
         required: true,
