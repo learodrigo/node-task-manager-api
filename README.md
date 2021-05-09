@@ -10,6 +10,6 @@ This tasks manager API performs CRUD operations through [node](https://nodejs.or
 * Ready to go
 
 ## References
-[MongoDB Driver API](https://mongodb.github.io/node-mongodb-native/3.6/api/)
-[Mongo operators](https://docs.mongodb.com/manual/reference/operator/)
-[HTTP statuses](https://httpstatuses.com/)
+* [MongoDB Driver API](https://mongodb.github.io/node-mongodb-native/3.6/api/)
+* [Mongo operators](https://docs.mongodb.com/manual/reference/operator/)
+* [HTTP statuses](https://httpstatuses.com/)
