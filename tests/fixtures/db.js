@@ -31,21 +31,21 @@ const taskOne = {
     _id: new mongoose.Types.ObjectId(),
     description: 'Task one',
     completed: false,
-    user: userOneId
+    user: userOne._id
 }
 
 const taskTwo = {
     _id: new mongoose.Types.ObjectId(),
     description: 'Task two',
     completed: true,
-    user: userOneId
+    user: userOne._id
 }
 
 const taskThree = {
     _id: new mongoose.Types.ObjectId(),
     description: 'Task three',
     completed: true,
-    user: userTwoId
+    user: userTwo._id
 }
 
 const setupDatabase = async () => {
