@@ -2,7 +2,7 @@ const sgMail = require('@sendgrid/mail')
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-const sendWelcomeEmail = ({ email, name }) => {
+const sendWelcomeEmail = async ({ email, name }) => {
     const msg = {
         to: email,
         from: 'leandrorodrigobs@gmail.com',
@@ -10,7 +10,7 @@ const sendWelcomeEmail = ({ email, name }) => {
         text: `Welcome to the app, ${name}. Let me know how you get along with the app`
     }
 
-    sgMail
+    await sgMail
         .send(msg)
         .then(() => {
             console.log('Confirmation email sent')
@@ -20,7 +20,7 @@ const sendWelcomeEmail = ({ email, name }) => {
         })
 }
 
-const sendCancelationEmail = ({ email, name }) => {
+const sendCancelationEmail = async ({ email, name }) => {
     const msg = {
         to: email,
         from: 'leandrorodrigobs@gmail.com',
@@ -28,7 +28,7 @@ const sendCancelationEmail = ({ email, name }) => {
         text: `We're sorry to see you leave, ${name}. Join us again whenever you want!`
     }
 
-    sgMail
+    await sgMail
         .send(msg)
         .then(() => {
             console.log('Cancellation email sent')

@@ -53,7 +53,7 @@ usersRouter.post('/users', async (req, res) => {
 
         await user.save()
 
-        sendWelcomeEmail(user)
+        await sendWelcomeEmail(user)
 
         const token = await user.generateAuthToken()
 
@@ -195,12 +195,12 @@ usersRouter.delete('/users/me', auth, async ({ user }, res) => {
     try {
         await user.remove()
 
-        sendCancelationEmail(user)
+        await sendCancelationEmail(user)
 
         res.send(user)
     }
     catch (error) {
-        res.status(500).send(error)
+        res.status(401).send(error)
     }
 })
 
